@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exercise 6 · Phone dialogue — Present simple vs present continuous</title>
+<style>
+  :root{
+    --ink:#1f2937; --muted:#64748b; --accent:#2563eb;
+    --ok:#15803d; --okbg:#e9f9ef; --okline:#22c55e;
+    --bad:#b91c1c; --badbg:#fdecec; --badline:#ef4444;
+    --rev:#6d28d9; --revbg:#f2ecfe; --revline:#8b5cf6;
+    --hintbg:#fff7e0; --hintline:#f59e0b; --hintink:#92400e;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(165deg,#eaf2ff 0%,#fdf3f8 55%,#fff7ea 100%);
+    min-height:100vh;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:28px 18px 64px}
+
+  header{text-align:center;margin-bottom:18px}
+  .rowtop{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:10px}
+  .badge{width:44px;height:44px;border-radius:12px;background:#1d4ed8;color:#fff;font-weight:800;font-size:22px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 6px 14px rgba(29,78,216,.35)}
+  .audio{display:inline-flex;align-items:center;gap:6px;background:#0f172a;color:#a5f3fc;font-weight:700;font-size:13px;
+    padding:7px 13px;border-radius:999px}
+  h1{font-size:clamp(21px,3.5vw,28px);margin:4px 0 8px}
+  .task{color:#334155;font-size:15.5px;line-height:1.55;margin:0 auto;max-width:620px}
+  .task b.pc{color:#9333ea}
+  .task b.ps{color:#1d4ed8}
+
+  .toolbar{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:18px 0 12px}
+  .btn{border:0;border-radius:12px;padding:11px 18px;font:inherit;font-weight:700;cursor:pointer;
+    box-shadow:0 3px 10px rgba(15,23,42,.14);transition:transform .1s, filter .2s}
+  .btn:hover{transform:translateY(-1px);filter:brightness(1.06)}
+  .btn:active{transform:translateY(0)}
+  .btn.primary{background:#16a34a;color:#fff}
+  .btn.ghost{background:#fff;color:#334155}
+
+  .hintbar{background:var(--hintbg);border:1px solid var(--hintline);color:var(--hintink);
+    border-radius:12px;padding:10px 14px;margin:0 0 14px;font-size:14.5px;line-height:1.5}
+  .hintbar.pulse{animation:pulse .5s ease}
+  @keyframes pulse{0%{transform:scale(.98);box-shadow:0 0 0 0 rgba(245,158,11,.5)}70%{box-shadow:0 0 0 8px rgba(245,158,11,0)}100%{transform:scale(1)}}
+
+  .phone{background:linear-gradient(180deg,#f8fafc,#eef2f7);border:1px solid #e2e8f0;border-radius:26px;
+    padding:14px;box-shadow:0 24px 48px rgba(15,23,42,.10)}
+  .callbar{display:flex;align-items:center;justify-content:center;gap:8px;background:#16a34a;color:#fff;
+    font-weight:700;border-radius:14px;padding:10px 14px;font-size:14.5px}
+  .callbar .time{margin-left:auto;background:rgba(255,255,255,.22);padding:2px 9px;border-radius:99px;font-size:12.5px}
+  .callbar .who-call{margin-left:auto;margin-right:auto}
+  .callbar .time{margin-left:0}
+  .dot{width:9px;height:9px;border-radius:50%;background:#bbf7d0;animation:blink 1.3s infinite}
+  @keyframes blink{50%{opacity:.25}}
+
+  .chat{padding:18px 8px 8px;display:flex;flex-direction:column;gap:13px}
+  .row{display:flex}
+  .row.lei{justify-content:flex-end}
+  .msgwrap{max-width:90%;display:flex;flex-direction:column}
+  .row.lei .msgwrap{align-items:flex-end}
+  .who{font-size:11.5px;font-weight:700;color:var(--muted);margin:0 8px 3px;letter-spacing:.3px}
+  .bubble{border-radius:16px;padding:10px 14px;font-size:16px;line-height:2.05;box-shadow:0 2px 6px rgba(15,23,42,.05)}
+  .row.toby .bubble{background:#f0f6ff;border:1px solid #bfdbfe}
+  .row.lei  .bubble{background:#fff5fb;border:1px solid #fbcfe8}
+
+  sup.n{color:var(--accent);font-weight:800;font-size:.7em;margin-right:1px}
+  .vrb{color:#0e7490;font-size:.85em;white-space:nowrap}
+  .gap{display:inline-block;white-space:nowrap;vertical-align:baseline}
+  input.gapin{
+    border:0;border-bottom:2px dashed #94a3b8;background:rgba(148,163,184,.12);
+    border-radius:8px 8px 0 0;padding:3px 8px;font:inherit;color:var(--ink);text-align:center;outline:none;
+    transition:background .2s,border-color .2s,color .2s;
+  }
+  input.gapin:focus{border-bottom:2px solid var(--accent);background:rgba(37,99,235,.08)}
+  input.gapin.ok{border-bottom:2px solid var(--okline);background:var(--okbg);color:var(--ok);font-weight:600}
+  input.gapin.bad{border-bottom:2px solid var(--badline);background:var(--badbg);color:var(--bad);animation:shake .3s ease}
+  input.gapin.rev{border-bottom:2px solid var(--revline);background:var(--revbg);color:var(--rev);font-style:italic}
+  input.exin{font-style:italic;border-bottom:2px dotted #64748b;background:transparent;color:#475569;cursor:default}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .hintbtn{border:0;background:none;cursor:pointer;font-size:13px;opacity:.55;padding:0 3px;vertical-align:middle;
+    transition:opacity .15s,transform .15s}
+  .hintbtn:hover{opacity:1;transform:scale(1.2)}
+
+  .scorebar{background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:14px 18px;margin-top:18px;
+    box-shadow:0 8px 20px rgba(15,23,42,.07);font-size:15.5px;line-height:1.6}
+  .scorebar .sub{color:var(--muted);font-size:13px}
+  .track{height:10px;background:#e2e8f0;border-radius:99px;overflow:hidden;margin-top:9px}
+  #fill{height:100%;width:0;background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .5s ease}
+
+  .grammar{margin-top:26px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:4px 18px;
+    box-shadow:0 8px 20px rgba(15,23,42,.06)}
+  .grammar summary{cursor:pointer;font-weight:800;padding:13px 0;font-size:15.5px;list-style-position:inside}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:4px 0 18px}
+  @media(max-width:600px){.cards{grid-template-columns:1fr}}
+  .card{border-radius:14px;padding:14px 16px;border:1px solid}
+  .card h3{margin:0 0 6px;font-size:15.5px}
+  .card ul{margin:8px 0 0;padding-left:18px;font-size:14px;line-height:1.6;color:#334155}
+  .card .ex{font-size:13.5px;color:var(--muted);font-style:italic;margin-top:8px}
+  .card.simple{background:#eff6ff;border-color:#bfdbfe}
+  .card.simple h3{color:#1d4ed8}
+  .card.cont{background:#fdf4ff;border-color:#f5d0fe}
+  .card.cont h3{color:#9333ea}
+
+  .note{font-size:13px;color:var(--muted);margin-top:16px;line-height:1.6;text-align:center}
+  .confetti{position:fixed;top:-24px;z-index:50;pointer-events:none;border-radius:2px;animation-name:fall;animation-timing-function:linear;animation-fill-mode:forwards}
+  @keyframes fall{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(108vh) rotate(680deg)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="rowtop">
+      <div class="badge">6</div>
+      <div class="audio">🎧 1.03</div>
+    </div>
+    <h1>Complete the phone dialogue</h1>
+    <p class="task">Use the correct <b class="ps">present simple</b> or <b class="pc">present continuous</b> form of the verbs in brackets.
+      Type your answers in the gaps, then press <b>✅ Check answers</b>. Gap 1 is the example.</p>
+  </header>
+
+  <div class="toolbar">
+    <button id="btnCheck" class="btn primary" type="button">✅ Check answers</button>
+    <button id="btnReveal" class="btn ghost" type="button">👀 Show answers</button>
+    <button id="btnReset" class="btn ghost" type="button">🔄 Reset</button>
+  </div>
+
+  <div id="hintbar" class="hintbar" hidden></div>
+
+  <section class="phone">
+    <div class="callbar">
+      <span class="dot"></span>
+      <span class="who-call">📞 Toby &nbsp;⇄&nbsp; Leia</span>
+      <span class="time" title="…just like the audio track number :)">01:03</span>
+    </div>
+
+    <div class="chat">
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble">Hi!</div>
+        </div>
+      </div>
+
+      <div class="row lei">
+        <div class="msgwrap">
+          <div class="who">Leia 🛍️</div>
+          <div class="bubble">Hi, Toby. What <sup class="n">1</sup><span class="gap" data-item="1"><input class="gapin exin" type="text" readonly value="are you doing" data-accept="are you doing" data-show="are you doing" data-min="14" aria-label="gap 1, example" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"></span> <span class="vrb">(you / do)?</span></div>
+        </div>
+      </div>
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble">I’m at the sports centre. I <sup class="n">2</sup><span class="gap" data-item="2"><input class="gapin" type="text" data-accept="m waiting|am waiting" data-show="’m waiting" data-min="9" aria-label="gap 2, verb wait" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="2" data-hint="happening now → present continuous: I ’m / am waiting" aria-label="hint for gap 2">💡</button></span> <span class="vrb">(wait)</span> for Tom.</div>
+        </div>
+      </div>
+
+      <div class="row lei">
+        <div class="msgwrap">
+          <div class="who">Leia 🛍️</div>
+          <div class="bubble"><sup class="n">3</sup><span class="gap" data-item="3"><input class="gapin" type="text" data-accept="are you going" data-show="Are you going" data-min="13" aria-label="gap 3, you go" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="3" data-hint="a question about now → present continuous: Are + you + going?" aria-label="hint for gap 3">💡</button></span> <span class="vrb">(you / go)</span> swimming?</div>
+        </div>
+      </div>
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble">No, we <sup class="n">4</sup><span class="gap" data-item="4"><input class="gapin" type="text" data-accept="re playing|are playing" data-show="’re playing" data-min="11" aria-label="gap 4, verb play" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="4" data-hint="happening now (that’s why they aren’t swimming) → present continuous: we ’re / are playing" aria-label="hint for gap 4">💡</button></span> <span class="vrb">(play)</span> table tennis. We <sup class="n">5</sup><span class="gap" data-item="5"><input class="gapin" type="text" data-accept="play" data-show="play" data-min="6" aria-label="gap 5, verb play" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="5" data-hint="a habit with ‘every Saturday morning’ → present simple: play" aria-label="hint for gap 5">💡</button></span> <span class="vrb">(play)</span> every Saturday morning. But he’s really late!</div>
+        </div>
+      </div>
+
+      <div class="row lei">
+        <div class="msgwrap">
+          <div class="who">Leia 🛍️</div>
+          <div class="bubble">What <sup class="n">6</sup><span class="gap" data-item="6"><input class="gapin" type="text" data-accept="s he doing|is he doing" data-show="’s he doing" data-min="11" aria-label="gap 6, he do" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="6" data-hint="a question about now → present continuous: What + ’s / is + he + doing?" aria-label="hint for gap 6">💡</button></span> <span class="vrb">(he / do)?</span></div>
+        </div>
+      </div>
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble">I <sup class="n">7</sup><span class="gap" data-item="7"><input class="gapin" type="text" data-accept="dont know|do not know" data-show="don’t know" data-min="10" aria-label="gap 7, not know" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="7" data-hint="state verb (know) → present simple: I don’t / do not know" aria-label="hint for gap 7">💡</button></span> <span class="vrb">(not know)</span>. He <sup class="n">8</sup><span class="gap" data-item="8"><input class="gapin" type="text" data-accept="isnt answering|is not answering|s not answering" data-show="isn’t answering" data-min="14" aria-label="gap 8, not answer" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="8" data-hint="happening now → present continuous: he isn’t / is not answering" aria-label="hint for gap 8">💡</button></span> <span class="vrb">(not answer)</span> his phone. Anyway, where are you?</div>
+        </div>
+      </div>
+
+      <div class="row lei">
+        <div class="msgwrap">
+          <div class="who">Leia 🛍️</div>
+          <div class="bubble">I’m at the shopping centre, but I <sup class="n">9</sup><span class="gap" data-item="9"><input class="gapin" type="text" data-accept="m not buying|am not buying" data-show="’m not buying" data-min="13" aria-label="gap 9, not buy" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="9" data-hint="‘today’ = around now → present continuous: I ’m / am not buying" aria-label="hint for gap 9">💡</button></span> <span class="vrb">(not buy)</span> anything today. I <sup class="n">10</sup><span class="gap" data-item="10"><input class="gapin" type="text" data-accept="m|am" data-show="’m" data-min="4" aria-label="gap 10, first part" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"></span> just <span class="gap" data-item="10"><input class="gapin" type="text" data-accept="looking" data-show="looking" data-min="9" aria-label="gap 10, verb look" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="10" data-hint="happening now → present continuous: I ’m / am + just + looking" aria-label="hint for gap 10">💡</button></span> <span class="vrb">(look)</span>.</div>
+        </div>
+      </div>
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble"><sup class="n">11</sup><span class="gap" data-item="11"><input class="gapin" type="text" data-accept="do you like" data-show="Do you like" data-min="11" aria-label="gap 11, you like" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="11" data-hint="state verb (like) → present simple question: Do + you + like…?" aria-label="hint for gap 11">💡</button></span> <span class="vrb">(you / like)</span> table tennis? <sup class="n">12</sup><span class="gap" data-item="12"><input class="gapin" type="text" data-accept="do you want" data-show="Do you want" data-min="11" aria-label="gap 12, you want" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="12" data-hint="state verb (want) → present simple question: Do + you + want…?" aria-label="hint for gap 12">💡</button></span> <span class="vrb">(you / want)</span> to play?</div>
+        </div>
+      </div>
+
+      <div class="row lei">
+        <div class="msgwrap">
+          <div class="who">Leia 🛍️</div>
+          <div class="bubble">Sure! But I <sup class="n">13</sup><span class="gap" data-item="13"><input class="gapin" type="text" data-accept="m not wearing|am not wearing" data-show="’m not wearing" data-min="14" aria-label="gap 13, not wear" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="13" data-hint="what she’s wearing now → present continuous: I ’m / am not wearing" aria-label="hint for gap 13">💡</button></span> <span class="vrb">(not wear)</span> sports clothes.</div>
+        </div>
+      </div>
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble"><sup class="n">14</sup><span class="gap" data-item="14"><input class="gapin" type="text" data-accept="are you wearing" data-show="Are you wearing" data-min="15" aria-label="gap 14, you wear" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="14" data-hint="a question about now → present continuous: Are + you + wearing…?" aria-label="hint for gap 14">💡</button></span> <span class="vrb">(you / wear)</span> trainers?</div>
+        </div>
+      </div>
+
+      <div class="row lei">
+        <div class="msgwrap">
+          <div class="who">Leia 🛍️</div>
+          <div class="bubble">Yes, I am — with jeans and a T-shirt.</div>
+        </div>
+      </div>
+
+      <div class="row toby">
+        <div class="msgwrap">
+          <div class="who">🏓 Toby</div>
+          <div class="bubble">That’s fine. You <sup class="n">15</sup><span class="gap" data-item="15"><input class="gapin" type="text" data-accept="dont need|do not need" data-show="don’t need" data-min="10" aria-label="gap 15, not need" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false"><button class="hintbtn" type="button" data-gap="15" data-hint="state verb (need) → present simple: you don’t / do not need" aria-label="hint for gap 15">💡</button></span> <span class="vrb">(not need)</span> sports clothes. See you soon!</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div id="scorebar" class="scorebar" hidden>
+    <div id="scoretext"></div>
+    <div class="track"><div id="fill"></div></div>
+  </div>
+
+  <details class="grammar">
+    <summary>📖 Grammar help — present simple vs present continuous</summary>
+    <div class="cards">
+      <div class="card simple">
+        <h3>⏱ Present simple</h3>
+        <ul>
+          <li><b>Form:</b> I / you / we / they <b>play</b> · he / she / it <b>plays</b></li>
+          <li><b>Use:</b> habits and routines, facts, states</li>
+          <li><b>Signals:</b> <i>every Saturday, always, usually, on Fridays</i></li>
+          <li><b>State verbs</b> (like, want, know, need) are normally simple, not continuous</li>
+        </ul>
+        <div class="ex">She plays tennis on Fridays.</div>
+      </div>
+      <div class="card cont">
+        <h3>💬 Present continuous</h3>
+        <ul>
+          <li><b>Form:</b> am / is / are + verb<b>-ing</b></li>
+          <li><b>Use:</b> actions happening now or around now</li>
+          <li><b>Signals:</b> <i>now, right now, today, at the moment, Look!, Listen!</i></li>
+        </ul>
+        <div class="ex">He’s playing football right now.</div>
+      </div>
+    </div>
+  </details>
+
+  <p class="note">💡 Contractions (<i>’m, isn’t, don’t</i>) and full forms (<i>am, is not, do not</i>) are both accepted — capital letters don’t matter.
+  Press <b>Enter</b> to jump to the next gap; on the last gap it checks everything. Click the little 💡 next to a gap if you need help.</p>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var inputs = Array.prototype.slice.call(document.querySelectorAll('input.gapin'));
+  var items  = Array.prototype.slice.call(document.querySelectorAll('.gap[data-item]'));
+  var scorebar = document.getElementById('scorebar');
+  var scoretext = document.getElementById('scoretext');
+  var fill = document.getElementById('fill');
+  var hintbar = document.getElementById('hintbar');
+  var FILL_DEFAULT = 'linear-gradient(90deg,#22c55e,#84cc16)';
+
+  function norm(s){
+    return (s || '').toLowerCase()
+      .replace(/[\u2019\u2018\u00B4`]/g, "'")
+      .replace(/'/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function isOk(inp){
+    var v = norm(inp.value);
+    if (!v) return false;
+    return ('|' + inp.getAttribute('data-accept') + '|').indexOf('|' + v + '|') > -1;
+  }
+  function fit(inp){
+    var min = parseInt(inp.getAttribute('data-min') || '7', 10);
+    var n = Math.max(min, inp.value.length + 1);
+    inp.style.width = Math.min(26, n + 1) + 'ch';
+  }
+
+  inputs.forEach(function(inp){
+    fit(inp);
+    inp.addEventListener('input', function(){
+      fit(inp);
+      inp.classList.remove('ok', 'bad', 'rev');
+    });
+    inp.addEventListener('focus', function(){ try { inp.select(); } catch(e){} });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('.hintbtn'), function(b){
+    b.addEventListener('click', function(ev){
+      ev.preventDefault();
+      hintbar.hidden = false;
+      hintbar.innerHTML = '<b>💡 Gap ' + b.getAttribute('data-gap') + '</b> — ' + b.getAttribute('data-hint');
+      hintbar.classList.remove('pulse');
+      void hintbar.offsetWidth;
+      hintbar.classList.add('pulse');
+    });
+  });
+
+  function checkAnswers(){
+    var correct = 0, empty = 0;
+    items.forEach(function(g){
+      var ins = Array.prototype.slice.call(g.querySelectorAll('input'));
+      var anyEmpty = ins.some(function(i){ return !i.value.trim(); });
+      if (anyEmpty){
+        empty++;
+        ins.forEach(function(i){ i.classList.remove('ok', 'bad'); });
+        return;
+      }
+      var all = true;
+      ins.forEach(function(i){
+        var okk = isOk(i);
+        i.classList.toggle('ok', okk);
+        i.classList.toggle('bad', !okk);
+        if (!okk) all = false;
+      });
+      if (all){ correct++; }
+      else {
+        ins.forEach(function(i){
+          if (i.classList.contains('bad')){
+            i.style.animation = 'none'; void i.offsetWidth; i.style.animation = '';
+          }
+        });
+      }
+    });
+    scorebar.hidden = false;
+    fill.style.background = FILL_DEFAULT;
+    fill.style.width = Math.round(correct / items.length * 100) + '%';
+    if (correct === items.length){
+      scoretext.innerHTML = '🏆 <b>Perfect! ' + correct + ' / ' + items.length + '</b> — great job! 🎉';
+      confetti();
+    } else {
+      var msg = 'You got <b>' + correct + ' / ' + items.length + '</b> correct.';
+      if (empty) msg += ' <span class="sub">(' + empty + ' gap' + (empty > 1 ? 's' : '') + ' still empty)</span>';
+      msg += '<br><span class="sub">🟩 correct · 🟥 try again · click the 💡 next to a red gap for a hint</span>';
+      scoretext.innerHTML = msg;
+    }
+    scorebar.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }
+
+  function revealAnswers(){
+    items.forEach(function(g){
+      Array.prototype.forEach.call(g.querySelectorAll('input'), function(i){
+        if (i.classList.contains('exin')){ i.classList.remove('ok','bad'); return; }
+        i.value = i.getAttribute('data-show');
+        fit(i);
+        i.classList.remove('ok','bad');
+        i.classList.add('rev');
+      });
+    });
+    scorebar.hidden = false;
+    fill.style.background = 'linear-gradient(90deg,#8b5cf6,#a78bfa)';
+    fill.style.width = '100%';
+    scoretext.innerHTML = '👀 <b>Answers shown.</b> <span class="sub">Press 🔄 Reset to hide them and try it yourself first!</span>';
+  }
+
+  function resetAll(){
+    items.forEach(function(g){
+      Array.prototype.forEach.call(g.querySelectorAll('input'), function(i){
+        if (i.classList.contains('exin')){ i.classList.remove('ok','bad'); fit(i); return; }
+        i.value = '';
+        i.classList.remove('ok','bad','rev');
+        fit(i);
+      });
+    });
+    scorebar.hidden = true;
+    fill.style.width = '0%';
+    fill.style.background = FILL_DEFAULT;
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function confetti(){
+    var colors = ['#f43f5e','#f59e0b','#10b981','#3b82f6','#a855f7','#ec4899','#84cc16'];
+    for (var i = 0; i < 110; i++){
+      var d = document.createElement('div');
+      d.className = 'confetti';
+      var s = 6 + Math.random() * 8;
+      d.style.width = s + 'px';
+      d.style.height = (s * 0.55) + 'px';
+      d.style.left = (Math.random() * 100) + 'vw';
+      d.style.background = colors[Math.floor(Math.random() * colors.length)];
+      d.style.animationDuration = (2.2 + Math.random() * 1.8) + 's';
+      d.style.animationDelay = (Math.random() * 0.7) + 's';
+      document.body.appendChild(d);
+      (function(el){
+        setTimeout(function(){ if (el.parentNode) el.parentNode.removeChild(el); }, 5200);
+      })(d);
+    }
+  }
+
+  document.getElementById('btnCheck').addEventListener('click', checkAnswers);
+  document.getElementById('btnReveal').addEventListener('click', revealAnswers);
+  document.getElementById('btnReset').addEventListener('click', resetAll);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter') return;
+    var idx = inputs.indexOf(document.activeElement);
+    if (idx === -1) return;
+    e.preventDefault();
+    if (idx === inputs.length - 1) checkAnswers();
+    else inputs[idx + 1].focus();
+  });
+})();
+</script>
+</body>
+</html>
